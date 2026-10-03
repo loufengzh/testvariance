@@ -47,7 +47,7 @@ No XML or JUnit parser is included. Convert reports upstream into this contract 
 
 ## Reading the report
 
-JSON is the default output. `schema_version: 1` identifies the report format. Groups sort lexicographically by the three identifiers; runs sort by `run_id`; attempt numbers sort only **within** each run. Input line order is irrelevant. Run identifiers are not interpreted as chronological timestamps.
+CLI output uses LF line endings on every platform, including Windows, for reports, diagnostics, and help/version messages. JSON is the default output. `schema_version: 1` identifies the report format. Groups sort lexicographically by the three identifiers; runs sort by `run_id`; attempt numbers sort only **within** each run. Input line order is irrelevant. Run identifiers are not interpreted as chronological timestamps.
 
 - `counts` counts observations by outcome. `executed_attempts` excludes skips.
 - `failure_frequency = (fail + error) / (pass + fail + error)`. This is an **attempt-weighted observed frequency**, not a per-build failure probability. All-skip groups produce `null`.

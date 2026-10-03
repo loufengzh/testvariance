@@ -43,7 +43,7 @@ cat examples/outcomes.jsonl | testvariance analyze - --fail-on-mixed
 
 ## 报告语义
 
-默认输出 JSON，`schema_version` 为 1。组按三个标识符排序，运行按 `run_id` 排序，尝试仅在各自运行内按序号排序。输入行顺序不重要，运行 ID 不被解释为时间顺序。
+所有平台（包括 Windows）的命令行报告、诊断和帮助/版本消息均使用 LF 换行。默认输出 JSON，`schema_version` 为 1。组按三个标识符排序，运行按 `run_id` 排序，尝试仅在各自运行内按序号排序。输入行顺序不重要，运行 ID 不被解释为时间顺序。
 
 - `counts` 是各结果的观测条数；`executed_attempts` 不含 skip。
 - `failure_frequency = (fail + error) / (pass + fail + error)`，是按尝试加权的观测频率，不是构建失败概率。全部跳过时为 null。

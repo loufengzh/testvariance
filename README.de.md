@@ -43,7 +43,7 @@ JUnit/XML-Import ist nicht enthalten. Konvertieren Sie Berichte vorher und bewah
 
 ## Bericht verstehen
 
-Standardausgabe ist JSON mit `schema_version: 1`. Gruppen werden nach ihren drei Kennungen sortiert, Läufe nach `run_id`, Versuche nur innerhalb eines Laufs nach ihrer Nummer. Die Eingabezeilen dürfen beliebig angeordnet sein. Laufkennungen werden nicht als zeitliche Reihenfolge interpretiert.
+Die CLI verwendet auf allen Plattformen einschließlich Windows LF-Zeilenenden für Berichte, Diagnosen sowie Hilfe- und Versionsausgaben. Standardausgabe ist JSON mit `schema_version: 1`. Gruppen werden nach ihren drei Kennungen sortiert, Läufe nach `run_id`, Versuche nur innerhalb eines Laufs nach ihrer Nummer. Die Eingabezeilen dürfen beliebig angeordnet sein. Laufkennungen werden nicht als zeitliche Reihenfolge interpretiert.
 
 - `counts` zählt Beobachtungen je Ergebnis; `executed_attempts` schließt skip aus.
 - `failure_frequency = (fail + error) / (pass + fail + error)` ist eine nach Versuchen gewichtete beobachtete Häufigkeit, keine Ausfallwahrscheinlichkeit eines Builds. Bei ausschließlich übersprungenen Versuchen ist sie null.

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import sys
 from contextlib import nullcontext
@@ -21,6 +22,11 @@ def render_text(report: dict) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Keep the CLI byte contract stable on Windows, including argparse output.
+    # Caller-supplied in-memory streams remain usable by library integrations.
+    for stream in (sys.stdout, sys.stderr):
+        if isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(newline="\n")
     parser = argparse.ArgumentParser(prog="testvariance", description="Offline comparable CI outcome evidence. No root-cause or flakiness verdict.")
     parser.add_argument("--version", action="version", version="testvariance 0.1.0")
     subparsers = parser.add_subparsers(dest="command", required=True)

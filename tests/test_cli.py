@@ -1,9 +1,13 @@
+import io
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
+
+from testvariance.cli import main
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -11,6 +15,35 @@ ROOT = Path(__file__).resolve().parents[1]
 class CliTests(unittest.TestCase):
     def call(self, *args, data=b''):
         return subprocess.run([sys.executable, '-m', 'testvariance', *args], input=data, capture_output=True, check=False)
+
+    def test_windows_newline_translation_is_disabled(self):
+        # Simulate Windows translation on every host; do not normalize assertions.
+        for args, expected_code in (
+            (['analyze', '-'], 0),
+            (['analyze', '-', '--format', 'text'], 0),
+            (['--version'], 0),
+            (['analyze', '/does-not-exist/private-input'], 2),
+            ([], 2),
+        ):
+            with self.subTest(args=args):
+                stdout_bytes, stderr_bytes = io.BytesIO(), io.BytesIO()
+                stdout = io.TextIOWrapper(stdout_bytes, encoding='utf-8', newline='\r\n')
+                stderr = io.TextIOWrapper(stderr_bytes, encoding='utf-8', newline='\r\n')
+                stdin = io.TextIOWrapper(io.BytesIO(b''), encoding='utf-8')
+                with patch('sys.stdout', stdout), patch('sys.stderr', stderr), patch('sys.stdin', stdin):
+                    try:
+                        code = main(args)
+                    except SystemExit as exc:
+                        code = exc.code
+                    stdout.flush()
+                    stderr.flush()
+                    output = stdout_bytes.getvalue() + stderr_bytes.getvalue()
+                self.assertEqual(code, expected_code)
+                self.assertIn(b'\n', output)
+                self.assertNotIn(b'\r', output)
+                stdout.close()
+                stderr.close()
+                stdin.close()
 
     def test_empty_exact_json(self):
         result = self.call('analyze', '-')

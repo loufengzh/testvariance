@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Preserve LF output on Windows for reports, diagnostics, and argparse help/version.
+- Add host-independent CRLF-translation regression coverage.
+
 ## 0.1.0
 
 - Canonical, bounded JSONL observations with strict duplicate rejection.
