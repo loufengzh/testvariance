@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "testvariance"
+version = "0.1.0"
+description = "Offline, comparable CI outcome evidence and observed retry cost"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "loufengzh"}]
+keywords = ["testing", "ci", "retries", "jsonl"]
+classifiers = ["Programming Language :: Python :: 3", "Operating System :: OS Independent"]
+
+[project.scripts]
+testvariance = "testvariance.cli:main"
+
+[project.urls]
+Repository = "https://github.com/loufengzh/testvariance"
+Issues = "https://github.com/loufengzh/testvariance/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
