@@ -77,3 +77,5 @@ python -m pip wheel --no-deps --no-build-isolation . -w dist
 ```
 
 Tests benötigen nur Python; zum Bauen müssen setuptools und wheel installiert sein. CI umfasst Linux mit Python 3.10–3.13, Windows mit Python 3.12 sowie die installierte CLI. Siehe [Beiträge](CONTRIBUTING.md), [Sicherheit](SECURITY.md), [Format](docs/FORMAT.md). Geplant sind ressourcenbegrenzte JUnit/Jest-Adapter, versioniertes Zusammenführen von Historien mit klarer Konfliktregel und transparente Evidenz-/Kostenranglisten. Diese Funktionen sowie Historienspeicher, automatische Isolation und Ursachendiagnose sind in 0.1.0 nicht enthalten. MIT-Lizenz.
+
+JSON-Fließkommazahlen, die ungleich null sind, bei der Umwandlung in float jedoch auf null gerundet werden (etwa `1e-400` oder `-1e-400`), werden abgewiesen und nicht als bekannte Dauer von null gemeldet. Exakte Null, darstellbare subnormale Werte und die übliche float-Rundung bleiben unterstützt. Die direkte Python-API prüft die übergebenen Werte; sie kann eine bereits vom Aufrufer auf null gerundete Zahl nicht rekonstruieren.

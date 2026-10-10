@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Reject nonzero JSON duration tokens that underflow to zero; preserve exact zero, representable subnormals and ordinary float rounding.
+
 - Preserve LF output on Windows for reports, diagnostics, and argparse help/version.
 - Add host-independent CRLF-translation regression coverage.
 

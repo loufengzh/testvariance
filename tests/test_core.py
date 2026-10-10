@@ -23,6 +23,20 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(rows[0].duration_seconds, None)
         self.assertEqual(rows[1].duration_seconds, 0)
 
+    def test_duration_underflow_rejected(self):
+        for token in ("1e-400", "-1e-400", "2e-324", "-2e-324", "0." + "0" * 350 + "1"):
+            raw = json.dumps(row(duration_seconds="TOKEN")).replace('"TOKEN"', token).encode()
+            with self.subTest(token=token), self.assertRaisesRegex(InputError, "line 1: nonzero number underflows"):
+                load_jsonl(io.BytesIO(raw))
+
+    def test_duration_float_boundaries_preserved(self):
+        for token in ("0e-999999", "-0.0e999999", "5e-324", "1e-320", "0.1", "1.0000000000000001"):
+            raw = json.dumps(row(duration_seconds="TOKEN")).replace('"TOKEN"', token).encode()
+            with self.subTest(token=token):
+                value = load_jsonl(io.BytesIO(raw))[0].duration_seconds
+                self.assertEqual(value, float(token))
+                self.assertEqual(math.copysign(1, value), math.copysign(1, float(token)))
+
     def test_invalid_records(self):
         invalid = [[], {}, row(unknown=1), row(attempt=True), row(attempt=0), row(attempt=-1), row(attempt=1.5), row(attempt="1"), row(outcome="failed"), row(outcome=[]), row(test_id=" "), row(environment=None), row(revision="x" * 4097), row(run_id="\ud800"), row(duration_seconds=-1), row(duration_seconds=True), row(duration_seconds="3"), row(duration_seconds=float("inf")), row(duration_seconds=float("nan")), row(duration_seconds=10**400)]
         for value in invalid:

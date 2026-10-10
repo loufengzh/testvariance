@@ -77,3 +77,5 @@ python -m pip wheel --no-deps --no-build-isolation . -w dist
 ```
 
 测试仅需 Python；构建需要已有 setuptools 和 wheel。CI 覆盖 Linux Python 3.10–3.13、Windows Python 3.12 和安装后 CLI。另见 [贡献指南](CONTRIBUTING.md)、[安全说明](SECURITY.md)、[格式说明](docs/FORMAT.md)。计划包括有界 JUnit/Jest 转换器、明确冲突策略的历史合并和透明成本排序；0.1.0 尚未实现这些功能，也不包含历史存储、自动隔离或根因诊断。MIT 许可。
+
+非零但转换为浮点数后舍入为零的 JSON 数字（例如 `1e-400` 或 `-1e-400`）会被拒绝，不会被报告为已知的零时长。精确的零、可表示的次正规数和普通浮点舍入仍受支持。直接调用 Python API 时，只能验证收到的值，无法恢复已被调用方舍入为零的原始数字。

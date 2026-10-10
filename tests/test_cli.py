@@ -70,6 +70,18 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.stdout, b'')
         self.assertEqual(result.stderr, b'testvariance: line 1: record has missing or unknown fields\n')
 
+    def test_duration_underflow_no_partial_report(self):
+        row = dict(test_id='private-test', revision='r', environment='e', run_id='a', attempt=1, outcome='pass', duration_seconds='TOKEN')
+        valid = json.dumps(dict(row, duration_seconds=1)).encode() + b'\n'
+        for token in ('1e-400', '-1e-400'):
+            data = valid + json.dumps(dict(row, attempt=2)).replace('"TOKEN"', token).encode()
+            with self.subTest(token=token):
+                result = self.call('analyze', '-', data=data)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, b'')
+                self.assertEqual(result.stderr, b'testvariance: line 2: nonzero number underflows the supported float range\n')
+                self.assertNotIn(b'private-test', result.stderr)
+
     def test_missing_file(self):
         result = self.call('analyze', '/does-not-exist/private-input')
         self.assertEqual(result.returncode, 2)

@@ -73,6 +73,15 @@ def _constant(_: str) -> None:
     raise InputError("nonstandard JSON numeric constant")
 
 
+def _parse_float(token: str) -> float:
+    """Preserve ordinary float precision without silently losing nonzero input."""
+    value = float(token)
+    mantissa = token.lower().split("e", 1)[0]
+    if value == 0 and any(char in "123456789" for char in mantissa):
+        raise InputError("nonzero number underflows the supported float range")
+    return value
+
+
 def load_jsonl(stream: BinaryIO) -> list[Observation]:
     """Read bounded UTF-8 JSONL. Blank lines are ignored; duplicate keys rejected."""
     observations = []
@@ -95,7 +104,8 @@ def load_jsonl(stream: BinaryIO) -> list[Observation]:
                 continue
             if len(observations) >= MAX_RECORDS:
                 raise InputError("input exceeds 100000 observations")
-            row = json.loads(line, object_pairs_hook=_object, parse_constant=_constant)
+            row = json.loads(line, object_pairs_hook=_object, parse_constant=_constant,
+                             parse_float=_parse_float)
             if not isinstance(row, dict):
                 raise InputError("record must be an object")
             if not REQUIRED.issubset(row) or set(row) - REQUIRED - {"duration_seconds"}:

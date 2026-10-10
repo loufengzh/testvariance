@@ -99,3 +99,5 @@ The first command needs only Python; the second requires installed setuptools an
 - Evidence/cost ranking with transparent missing-data treatment
 
 Adapters, history storage, automatic quarantine, rerunning tests, and causal diagnoses are **not implemented** in 0.1.0. MIT licensed.
+
+JSON floating-point tokens that are nonzero but round to zero (for example, `1e-400` or `-1e-400`) are rejected rather than reported as a known zero duration. Exact zero, representable subnormal values and ordinary float rounding remain supported. The direct Python API validates the values it receives; it cannot recover a token already rounded to zero by the caller.

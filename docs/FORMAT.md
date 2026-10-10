@@ -50,7 +50,10 @@ The public `analyze` iterable interface applies the record limit and duplicate
 check too. Direct `Observation` construction applies the same field validation.
 
 Known durations use an accurate floating-point summation, with overflow rejected.
-Values retain ordinary floating-point limitations. Durations are not rounded to
+Nonzero JSON float tokens that underflow to zero are rejected before field
+validation, including negative durations. Exact zero and representable subnormal
+values remain valid. Values otherwise retain ordinary floating-point limitations.
+The direct Python API cannot distinguish literal zero from caller-side underflow. Durations are not rounded to
 currency, combined across groups as a score, or treated as wall-clock latency.
 
 ## Future adapters
