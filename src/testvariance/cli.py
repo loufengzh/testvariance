@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import os
 import sys
 from contextlib import nullcontext
 
@@ -40,10 +41,31 @@ def main(argv: list[str] | None = None) -> int:
         with source as stream:
             report = analyze(load_jsonl(stream))
         output = json.dumps(report, sort_keys=True, indent=2, ensure_ascii=True, allow_nan=False) + "\n" if args.format == "json" else render_text(report)
-        sys.stdout.write(output)
-        return 1 if args.fail_on_mixed and report["mixed_group_count"] else 0
     except (InputError, OSError) as exc:
         # OSError may carry source paths. Never echo source contents or file paths.
         reason = str(exc) if isinstance(exc, InputError) else "cannot read input or write output"
         print(f"testvariance: {reason}", file=sys.stderr)
         return 2
+    try:
+        if sys.stdout is None:
+            raise OSError("stdout is unavailable")
+        sys.stdout.write(output)
+        # Detect buffered failures before interpreter shutdown can replace the
+        # documented status with 120 and emit an unsanitized diagnostic.
+        sys.stdout.flush()
+    except (OSError, ValueError):
+        # Discard buffered output so shutdown cannot retry the failing sink.
+        try:
+            target = sys.stdout.fileno()
+            sink = os.open(os.devnull, os.O_WRONLY)
+            if sink != target:
+                try:
+                    os.dup2(sink, target)
+                finally:
+                    os.close(sink)
+        except (OSError, ValueError, AttributeError):
+            # Embedded callers may supply a descriptor-free stream.
+            sys.stdout = None
+        print("testvariance: cannot read input or write output", file=sys.stderr)
+        return 2
+    return 1 if args.fail_on_mixed and report["mixed_group_count"] else 0
